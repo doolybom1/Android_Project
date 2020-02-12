@@ -3,6 +3,7 @@ package com.biz.memo;
 import android.os.Bundle;
 
 import com.biz.memo.adapter.MemoViewAdapter;
+import com.biz.memo.adapter.MemoViewModel;
 import com.biz.memo.domain.MemoVO;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -10,6 +11,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +34,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextInputEditText m_input_memo = null;
     RecyclerView memo_list_view = null;
     RecyclerView.Adapter view_adapter = null;
+
+    /*
+        DB 연동을 위한 변수들 선언
+     */
+    MemoViewModel memoViewModel;
+
+    ViewModelProvider.Factory viewModelFactory;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,15 +56,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         m_input_memo = findViewById(R.id.m_input_text);
 
-//        for (int i = 0; i<30 ; i++){
-//            MemoVO memoVO = new MemoVO();
-//            memoVO.setM_date(cd.format(date));
-//            memoVO.setM_time(st.format(date));
-//            memoVO.setM_text((i+1) + " 번째 메모");
-//            memoList.add(memoVO);
-//        }
 
         memo_list_view = findViewById(R.id.memo_list_view);
+
+
+        /*
+            DB와 연동을 위한 준비
+         */
+        memoViewModel = new ViewModelProvider(getViewModelStore(),viewModelFactory).get(MemoViewModel.class);
+        memoList = memoViewModel.selectAll();
+
+
+
         view_adapter = new MemoViewAdapter(MainActivity.this, memoList);
         memo_list_view.setAdapter(view_adapter);
 
@@ -65,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         itemDecoration.setDrawable(this.getResources().getDrawable(R.drawable.decoration_line, getApplication().getTheme()));
 
         memo_list_view.addItemDecoration(itemDecoration);
+
+
 
 
         FloatingActionButton fab = findViewById(R.id.fab);
